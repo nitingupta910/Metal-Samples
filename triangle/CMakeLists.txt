@@ -1,46 +1,13 @@
-cmake_minimum_required(VERSION 3.15)
 project(triangle)
-
-set(CMAKE_CXX_STANDARD 20)
 
 # Add the executable
 add_executable(${PROJECT_NAME} main.cpp)
 
-# Name of the compiled Metal library
-set(METAL_SHADER_NAME shaders.metallib)
+# Setup metal shaders for this project
+setup_metal_shaders(${PROJECT_NAME} "${CMAKE_CURRENT_SOURCE_DIR}/shaders.metal")
 
-# Path to the Metal shader source
-set(METAL_SHADER_SRC ${CMAKE_CURRENT_SOURCE_DIR}/shaders.metal)
-
-# Output paths for the intermediate .air and final .metallib files
-set(METAL_SHADER_AIR ${CMAKE_BINARY_DIR}/shaders.air)
-set(METAL_SHADER_LIB ${CMAKE_BINARY_DIR}/${METAL_SHADER_NAME})
-
-# Add a custom command to compile the Metal shaders
-add_custom_command(
-        OUTPUT ${METAL_SHADER_LIB}
-        COMMAND xcrun metal -c ${METAL_SHADER_SRC} -o ${METAL_SHADER_AIR}
-        COMMAND xcrun metallib ${METAL_SHADER_AIR} -o ${METAL_SHADER_LIB}
-        DEPENDS ${METAL_SHADER_SRC}
-        COMMENT "Compiling Metal shaders"
-)
-
-# Add a custom target to ensure the shaders are always compiled
-add_custom_target(compile_shaders ALL DEPENDS ${METAL_SHADER_LIB})
-
-# Ensure the shaders are available for your application
-add_dependencies(${PROJECT_NAME} compile_shaders)
-
-# Copy the .metallib file to the runtime build directory
-add_custom_command(
-        TARGET compile_shaders POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-        ${METAL_SHADER_LIB} ${CMAKE_BINARY_DIR}
-        COMMENT "Copying Metal library file to build directory"
-)
-
-# Link SDL2 and Metal frameworks
+# Link required libraries
 target_link_libraries(${PROJECT_NAME} PRIVATE
-        SDL2::SDL2
-        metal_frameworks
+    SDL2::SDL2
+    metal_frameworks
 )
