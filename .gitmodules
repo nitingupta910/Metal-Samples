@@ -1,0 +1,6 @@
+[submodule "deps/SDL"]
+	path = deps/SDL
+	url = https://github.com/libsdl-org/SDL.git
+[submodule "deps/metal-cpp"]
+	path = deps/metal-cpp
+	url = https://github.com/bkaradzic/metal-cpp.git
